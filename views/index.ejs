@@ -1,0 +1,59 @@
+<%- include('partials/header', { title: '首页' }) %>
+
+<section class="hero">
+  <h1>欢迎来到校园论坛</h1>
+  <p>学习 · 交流 · 分享 · 成长</p>
+</section>
+
+<section class="boards-grid">
+  <% boards.forEach(b => { %>
+    <a class="board-card" href="/b/<%= b.slug %>">
+      <h3><%= b.name %></h3>
+      <p><%= b.description %></p>
+    </a>
+  <% }) %>
+</section>
+
+<div class="two-col">
+  <section class="card">
+    <div class="card-head"><h2>最新帖子</h2></div>
+    <ul class="post-list">
+      <% latestPosts.forEach(p => { %>
+        <li>
+          <a href="/p/<%= p.id %>" class="post-title">
+            <% if (p.is_pinned) { %><span class="tag pin">置顶</span><% } %>
+            <% if (p.is_essential) { %><span class="tag ess">精华</span><% } %>
+            <%= p.title %>
+          </a>
+          <div class="meta">
+            <span class="board-tag"><%= p.board_name %></span>
+            <span><%= p.username %></span>
+            <span><%= timeAgo(p.created_at) %></span>
+            <span>💬 <%= p.reply_count %></span>
+            <span>👍 <%= p.like_count %></span>
+          </div>
+        </li>
+      <% }) %>
+      <% if (latestPosts.length === 0) { %><li class="empty">还没有帖子，快来发第一帖吧！</li><% } %>
+    </ul>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>热门帖子</h2></div>
+    <ul class="post-list">
+      <% hotPosts.forEach(p => { %>
+        <li>
+          <a href="/p/<%= p.id %>" class="post-title"><%= p.title %></a>
+          <div class="meta">
+            <span class="board-tag"><%= p.board_name %></span>
+            <span>💬 <%= p.reply_count %></span>
+            <span>👍 <%= p.like_count %></span>
+          </div>
+        </li>
+      <% }) %>
+      <% if (hotPosts.length === 0) { %><li class="empty">暂无热门帖子</li><% } %>
+    </ul>
+  </section>
+</div>
+
+<%- include('partials/footer') %>

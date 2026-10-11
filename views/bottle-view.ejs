@@ -1,0 +1,29 @@
+<%- include('partials/header', { title: '漂流瓶对话' }) %>
+<div class="card">
+  <h2>🍾 漂流瓶对话</h2>
+  <p class="muted small">双方均为匿名，管理员可在后台看到真实身份。</p>
+
+  <div class="bottle-thread">
+    <div class="bubble <%= bottle.user_id === user.id ? 'me' : 'other' %>">
+      <div class="bubble-meta"><%= bottle.user_id === user.id ? '我（扔瓶人）' : '匿名' %> · <%= timeAgo(bottle.created_at) %></div>
+      <p><%- nl2br(bottle.content) %></p>
+    </div>
+    <% replies.forEach(r => { %>
+      <div class="bubble <%= r.user_id === user.id ? 'me' : 'other' %> <%= r.status === 'pending' ? 'pending' : '' %>">
+        <div class="bubble-meta">
+          <%= r.user_id === user.id ? '我' : '匿名' %> · <%= timeAgo(r.created_at) %>
+          <% if (r.status === 'pending') { %><span class="tag warn">待审核</span><% } %>
+        </div>
+        <p><%- nl2br(r.content) %></p>
+      </div>
+    <% }) %>
+  </div>
+
+  <% if (user.status === 'active') { %>
+    <form action="/bottle/<%= bottle.id %>/reply" method="post" class="form">
+      <textarea name="content" rows="3" maxlength="1000" placeholder="回复..." required></textarea>
+      <button class="btn primary" type="submit">发送（需审核）</button>
+    </form>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

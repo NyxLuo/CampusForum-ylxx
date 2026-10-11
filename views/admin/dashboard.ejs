@@ -1,0 +1,24 @@
+<%- include('../partials/header', { title: '管理后台' }) %>
+<div class="admin-layout">
+  <aside class="admin-nav">
+    <a class="active" href="/admin">📊 概览</a>
+    <a href="/admin/users">👥 用户管理</a>
+    <a href="/admin/audit">📝 内容审核</a>
+    <a href="/admin/reports">🚨 举报处理</a>
+    <a href="/admin/boards">📋 板块与版主</a>
+  </aside>
+  <div class="admin-main">
+    <h1>管理后台</h1>
+    <div class="stats-grid">
+      <div class="stat-card"><span class="stat-num"><%= stats.users %></span><span>用户总数</span></div>
+      <div class="stat-card warn"><span class="stat-num"><%= stats.pendingUsers %></span><span>待审核用户</span></div>
+      <div class="stat-card"><span class="stat-num"><%= stats.posts %></span><span>帖子总数</span></div>
+      <div class="stat-card"><span class="stat-num"><%= stats.replies %></span><span>回复总数</span></div>
+      <div class="stat-card warn"><span class="stat-num"><%= stats.pendingWall %></span><span>待审留言墙</span></div>
+      <div class="stat-card warn"><span class="stat-num"><%= stats.pendingBottle %></span><span>待审漂流瓶</span></div>
+      <div class="stat-card warn"><span class="stat-num"><%= stats.pendingBottleReply %></span><span>待审瓶回复</span></div>
+      <div class="stat-card danger"><span class="stat-num"><%= stats.pendingReports %></span><span>待处理举报</span></div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

@@ -1,0 +1,46 @@
+<%- include('partials/header', { title: profile.username }) %>
+<div class="card profile-head">
+  <span class="avatar xl" style="background:<%= profile.avatar_color %>"><%= profile.username[0].toUpperCase() %></span>
+  <div>
+    <h1><%= profile.username %>
+      <% if (profile.role === 'admin') { %><span class="tag admin">管理员</span><% } %>
+      <% if (isMod) { %><span class="tag mod">版主</span><% } %>
+      <% if (profile.status === 'pending') { %><span class="tag warn">待审核</span><% } %>
+      <% if (profile.status === 'banned') { %><span class="tag danger">已封禁</span><% } %>
+    </h1>
+    <p class="muted">注册于 <%= formatTime(profile.created_at) %></p>
+  </div>
+</div>
+
+<section class="card">
+  <h2>发布的帖子</h2>
+  <ul class="post-list">
+    <% posts.forEach(p => { %>
+      <li>
+        <a href="/p/<%= p.id %>" class="post-title"><%= p.title %></a>
+        <div class="meta">
+          <a class="board-tag" href="/b/<%= p.board_slug %>"><%= p.board_name %></a>
+          <span><%= timeAgo(p.created_at) %></span>
+          <span>💬 <%= p.reply_count %></span>
+          <span>👍 <%= p.like_count %></span>
+        </div>
+      </li>
+    <% }) %>
+    <% if (posts.length === 0) { %><li class="empty">还没有发过帖</li><% } %>
+  </ul>
+</section>
+
+<section class="card">
+  <h2>最近的回复</h2>
+  <ul class="post-list">
+    <% replies.forEach(r => { %>
+      <li>
+        <a href="/p/<%= r.post_id %>" class="post-title">回复了《<%= r.post_title %>》</a>
+        <div class="meta"><span class="muted"><%= nl2br(r.content.slice(0, 100)) %></span></div>
+        <div class="meta"><span><%= timeAgo(r.created_at) %></span></div>
+      </li>
+    <% }) %>
+    <% if (replies.length === 0) { %><li class="empty">还没有回复</li><% } %>
+  </ul>
+</section>
+<%- include('partials/footer') %>

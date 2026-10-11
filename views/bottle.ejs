@@ -1,0 +1,65 @@
+<%- include('partials/header', { title: '漂流瓶' }) %>
+<div class="card">
+  <h1>🍾 漂流瓶</h1>
+  <p class="muted">写下想说的话，扔进海里，等待有缘人捞起。所有内容匿名，需管理员审核。</p>
+  <p>当前海里漂浮着 <strong><%= poolCount %></strong> 个漂流瓶</p>
+
+  <div class="two-col">
+    <div>
+      <h3>扔一个</h3>
+      <% if (user && user.status === 'active') { %>
+        <form action="/bottle/throw" method="post" class="form">
+          <textarea name="content" rows="4" maxlength="1000" placeholder="写点什么..." required></textarea>
+          <button class="btn primary" type="submit">扔进大海（需审核）</button>
+        </form>
+      <% } else { %>
+        <div class="alert info">只有注册并通过审核的用户才能扔漂流瓶。</div>
+      <% } %>
+    </div>
+    <div>
+      <h3>捞一个</h3>
+      <% if (user && user.status === 'active') { %>
+        <form action="/bottle/fish" method="post">
+          <button class="btn primary" type="submit">🎣 捞漂流瓶</button>
+        </form>
+      <% } else { %>
+        <div class="alert info">登录后才能捞漂流瓶。</div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<section class="card">
+  <h2>我扔出的漂流瓶</h2>
+  <ul class="post-list">
+    <% myThrown.forEach(b => { %>
+      <li>
+        <a href="/bottle/<%= b.id %>" class="post-title">
+          <%= b.content.slice(0, 40) %><%= b.content.length > 40 ? '...' : '' %>
+        </a>
+        <div class="meta">
+          <span class="tag <%= b.status === 'in_pool' ? 'info' : b.status === 'pending' ? 'warn' : 'ok' %>">
+            <%= {pending:'待审核',in_pool:'在海里',taken:'已被捞起',rejected:'未通过'}[b.status] || b.status %>
+          </span>
+          <span>回复 <%= b.reply_count %></span>
+          <span><%= timeAgo(b.created_at) %></span>
+        </div>
+      </li>
+    <% }) %>
+    <% if (myThrown.length === 0) { %><li class="empty">还没扔过</li><% } %>
+  </ul>
+</section>
+
+<section class="card">
+  <h2>我捞到的漂流瓶</h2>
+  <ul class="post-list">
+    <% myTaken.forEach(b => { %>
+      <li>
+        <a href="/bottle/<%= b.id %>" class="post-title"><%= b.content.slice(0, 40) %><%= b.content.length > 40 ? '...' : '' %></a>
+        <div class="meta"><span><%= timeAgo(b.created_at) %></span></div>
+      </li>
+    <% }) %>
+    <% if (myTaken.length === 0) { %><li class="empty">还没捞到过</li><% } %>
+  </ul>
+</section>
+<%- include('partials/footer') %>

@@ -1,0 +1,30 @@
+<%- include('partials/header', { title: '搜索' }) %>
+<div class="card">
+  <h1>🔍 搜索帖子</h1>
+  <form action="/search" method="get" class="form inline-form">
+    <input type="text" name="q" value="<%= q %>" placeholder="输入关键词..." autofocus>
+    <button class="btn primary" type="submit">搜索</button>
+  </form>
+</div>
+
+<% if (q) { %>
+<section class="card">
+  <h2>搜索结果：<%= results.length %> 条</h2>
+  <ul class="post-list">
+    <% results.forEach(p => { %>
+      <li>
+        <a href="/p/<%= p.id %>" class="post-title"><%= p.title %></a>
+        <div class="meta">
+          <a class="board-tag" href="/b/<%= p.board_slug %>"><%= p.board_name %></a>
+          <span><%= p.username %></span>
+          <span><%= timeAgo(p.created_at) %></span>
+          <span>💬 <%= p.reply_count %></span>
+          <span>👍 <%= p.like_count %></span>
+        </div>
+      </li>
+    <% }) %>
+    <% if (results.length === 0) { %><li class="empty">没有找到相关帖子</li><% } %>
+  </ul>
+</section>
+<% } %>
+<%- include('partials/footer') %>

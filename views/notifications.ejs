@@ -1,0 +1,14 @@
+<%- include('partials/header', { title: '通知' }) %>
+<div class="card">
+  <h1>🔔 通知</h1>
+  <ul class="notif-list">
+    <% list.forEach(n => { %>
+      <li class="<%= n.is_read ? '' : 'unread' %>">
+        <a href="<%= n.link || '#' %>"><%= n.content %></a>
+        <span class="muted small"><%= timeAgo(n.created_at) %></span>
+      </li>
+    <% }) %>
+    <% if (list.length === 0) { %><li class="empty">暂无通知</li><% } %>
+  </ul>
+</div>
+<%- include('partials/footer') %>

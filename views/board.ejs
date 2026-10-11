@@ -1,0 +1,51 @@
+<%- include('partials/header', { title: board.name }) %>
+
+<div class="board-header">
+  <div>
+    <h1><%= board.name %></h1>
+    <p class="muted"><%= board.description %></p>
+    <% if (moderators.length) { %>
+      <p class="muted small">版主：
+        <% moderators.forEach((m, i) => { %>
+          <a href="/u/<%= m.id %>"><%= m.username %></a><%= i < moderators.length - 1 ? '、' : '' %>
+        <% }) %>
+      </p>
+    <% } %>
+  </div>
+  <div class="board-actions">
+    <a class="btn-mini <%= sort === 'new' ? 'active' : '' %>" href="?sort=new">最新</a>
+    <a class="btn-mini <%= sort === 'hot' ? 'active' : '' %>" href="?sort=hot">最热</a>
+    <% if (canPost.ok) { %>
+      <a class="btn primary" href="/b/<%= board.slug %>/new">发帖</a>
+    <% } else { %>
+      <span class="btn disabled" title="<%= canPost.reason %>">发帖</span>
+    <% } %>
+  </div>
+</div>
+
+<% if (!canPost.ok && user) { %><div class="alert warn"><%= canPost.reason %></div><% } %>
+
+<ul class="post-list big">
+  <% posts.forEach(p => { %>
+    <li>
+      <a href="/p/<%= p.id %>" class="post-title">
+        <% if (p.is_pinned) { %><span class="tag pin">置顶</span><% } %>
+        <% if (p.is_essential) { %><span class="tag ess">精华</span><% } %>
+        <%= p.title %>
+      </a>
+      <div class="meta">
+        <a href="/u/<%= p.user_id %>" class="user-chip">
+          <span class="avatar small" style="background:<%= p.avatar_color %>"><%= p.username[0].toUpperCase() %></span>
+          <%= p.username %>
+        </a>
+        <span><%= timeAgo(p.created_at) %></span>
+        <span>👁 <%= p.views %></span>
+        <span>💬 <%= p.reply_count %></span>
+        <span>👍 <%= p.like_count %></span>
+      </div>
+    </li>
+  <% }) %>
+  <% if (posts.length === 0) { %><li class="empty">本版还没有帖子</li><% } %>
+</ul>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= typeof title !== 'undefined' ? title : '校园论坛' %></title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo">🎓 校园论坛</a>
+    <nav class="main-nav">
+      <a href="/">首页</a>
+      <a href="/wall">留言墙</a>
+      <a href="/bottle">漂流瓶</a>
+      <a href="/search">搜索</a>
+    </nav>
+    <div class="user-area">
+      <% if (user) { %>
+        <a href="/notifications" class="notif-link">🔔<% if (unreadCount > 0) { %><span class="badge"><%= unreadCount %></span><% } %></a>
+        <a href="/u/<%= user.id %>" class="user-link">
+          <span class="avatar" style="background:<%= user.avatar_color %>"><%= user.username[0].toUpperCase() %></span>
+          <%= user.username %>
+        </a>
+        <% if (user.role === 'admin') { %><a href="/admin" class="btn-mini">管理</a><% } %>
+        <form action="/logout" method="post" class="inline"><button class="btn-link">退出</button></form>
+      <% } else { %>
+        <a href="/login" class="btn-mini">登录</a>
+        <a href="/register" class="btn-mini primary">注册</a>
+      <% } %>
+    </div>
+  </div>
+</header>
+<main class="container main-content">
+<% if (typeof error !== 'undefined' && error) { %><div class="alert error"><%= error %></div><% } %>
+<% if (typeof success !== 'undefined' && success) { %><div class="alert success"><%= success %></div><% } %>
+<% if (typeof msg !== 'undefined' && msg) { %><div class="alert info"><%= msg %></div><% } %>

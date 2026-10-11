@@ -1,0 +1,100 @@
+<%- include('../partials/header', { title: '用户管理' }) %>
+<div class="admin-layout">
+  <aside class="admin-nav">
+    <a href="/admin">📊 概览</a>
+    <a class="active" href="/admin/users">👥 用户管理</a>
+    <a href="/admin/audit">📝 内容审核</a>
+    <a href="/admin/reports">🚨 举报处理</a>
+    <a href="/admin/boards">📋 板块与版主</a>
+  </aside>
+  <div class="admin-main">
+    <h1>用户管理</h1>
+
+    <h2>当前生效的限制</h2>
+    <table class="table">
+      <thead><tr><th>用户</th><th>类型</th><th>板块</th><th>原因</th><th>到期</th><th></th></tr></thead>
+      <tbody>
+        <% restrictions.forEach(r => { %>
+          <tr>
+            <td><%= r.username %></td>
+            <td><%= typeLabel(r.type) %></td>
+            <td><%= r.board_name || '全站' %></td>
+            <td><%= r.reason %></td>
+            <td><%= r.until ? formatTime(r.until) : '永久' %></td>
+            <td>
+              <form action="/unrestrict" method="post" class="inline">
+                <input type="hidden" name="id" value="<%= r.id %>">
+                <button class="btn-link danger">解除</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (restrictions.length === 0) { %><tr><td colspan="6" class="empty">暂无生效限制</td></tr><% } %>
+      </tbody>
+    </table>
+
+    <h2>全部用户</h2>
+    <table class="table">
+      <thead><tr><th>ID</th><th>用户名</th><th>角色</th><th>状态</th><th>发帖数</th><th>版主</th><th>操作</th></tr></thead>
+      <tbody>
+        <% users.forEach(u => { %>
+          <tr>
+            <td><%= u.id %></td>
+            <td><a href="/u/<%= u.id %>"><%= u.username %></a></td>
+            <td><%= u.role === 'admin' ? '管理员' : '用户' %></td>
+            <td>
+              <span class="tag <%= u.status === 'active' ? 'ok' : u.status === 'pending' ? 'warn' : 'danger' %>">
+                <%= {active:'正常', pending:'待审核', rejected:'已拒绝', banned:'已封禁'}[u.status] %>
+              </span>
+            </td>
+            <td><%= u.post_count %></td>
+            <td class="muted small"><%= u.mod_boards || '-' %></td>
+            <td class="actions">
+              <% if (u.status === 'pending') { %>
+                <form action="/admin/users/<%= u.id %>/approve" method="post" class="inline"><button class="btn-mini primary">通过</button></form>
+                <form action="/admin/users/<%= u.id %>/reject" method="post" class="inline"><button class="btn-mini danger">拒绝</button></form>
+              <% } %>
+              <% if (u.role !== 'admin') { %>
+                <details class="inline-details">
+                  <summary class="btn-mini">限制</summary>
+                  <form action="/restrict" method="post" class="form tight">
+                    <input type="hidden" name="user_id" value="<%= u.id %>">
+                    <select name="type">
+                      <option value="site_mute">全站禁言</option>
+                      <option value="site_ban">全站封禁</option>
+                      <option value="board_mute">板块禁言</option>
+                      <option value="board_ban">板块封禁</option>
+                    </select>
+                    <select name="board_id">
+                      <option value="">（板块级时选）</option>
+                      <% boards.forEach(b => { %><option value="<%= b.id %>"><%= b.name %></option><% }) %>
+                    </select>
+                    <input type="number" name="days" placeholder="天数(空=永久)" min="1">
+                    <input type="text" name="reason" placeholder="原因">
+                    <button class="btn-mini danger">执行</button>
+                  </form>
+                </details>
+                <details class="inline-details">
+                  <summary class="btn-mini">版主</summary>
+                  <form action="/admin/users/<%= u.id %>/promote" method="post" class="form tight">
+                    <select name="board_id">
+                      <% boards.forEach(b => { %><option value="<%= b.id %>"><%= b.name %></option><% }) %>
+                    </select>
+                    <button class="btn-mini primary">任命</button>
+                  </form>
+                  <form action="/admin/users/<%= u.id %>/demote" method="post" class="form tight">
+                    <select name="board_id">
+                      <% boards.forEach(b => { %><option value="<%= b.id %>"><%= b.name %></option><% }) %>
+                    </select>
+                    <button class="btn-mini">撤销</button>
+                  </form>
+                </details>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('../partials/footer') %>

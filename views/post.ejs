@@ -1,0 +1,138 @@
+<%- include('partials/header', { title: post.title }) %>
+
+<article class="card post-detail">
+  <div class="post-head">
+    <h1><% if (post.is_pinned) { %><span class="tag pin">置顶</span><% } %><% if (post.is_essential) { %><span class="tag ess">精华</span><% } %><%= post.title %></h1>
+    <div class="meta">
+      <a href="/u/<%= post.user_id %>" class="user-chip">
+        <span class="avatar small" style="background:<%= post.avatar_color %>"><%= post.username[0].toUpperCase() %></span>
+        <%= post.username %>
+      </a>
+      <a class="board-tag" href="/b/<%= post.board_slug %>"><%= post.board_name %></a>
+      <span><%= formatTime(post.created_at) %></span>
+      <span>👁 <%= post.views %></span>
+    </div>
+  </div>
+
+  <div class="post-content"><%- nl2br(post.content) %></div>
+
+  <div class="post-actions">
+    <button class="btn-like" data-type="post" data-id="<%= post.id %>">
+      👍 <span class="like-count"><%= likeCount('post', post.id) %></span>
+      <% if (user && hasLiked(user.id, 'post', post.id)) { %><span class="liked">已赞</span><% } %>
+    </button>
+    <button class="btn-link report-btn" data-type="post" data-id="<%= post.id %>">举报</button>
+    <% if (isAuthor || canManage) { %>
+      <form action="/p/<%= post.id %>/delete" method="post" class="inline" onsubmit="return confirm('确定删除？')">
+        <button class="btn-link danger">删除</button>
+      </form>
+    <% } %>
+    <% if (canManage) { %>
+      <form action="/p/<%= post.id %>/pin" method="post" class="inline">
+        <button class="btn-link"><%= post.is_pinned ? '取消置顶' : '置顶' %></button>
+      </form>
+      <form action="/p/<%= post.id %>/essential" method="post" class="inline">
+        <button class="btn-link"><%= post.is_essential ? '取消加精' : '加精' %></button>
+      </form>
+      <button class="btn-link danger" onclick="showRestrict(<%= post.user_id %>, <%= post.board_id %>)">管理作者</button>
+    <% } %>
+  </div>
+</article>
+
+<section class="card">
+  <h2>回复（<%= replies.length %>）</h2>
+  <% if (canPost.ok) { %>
+    <form action="/p/<%= post.id %>/reply" method="post" class="form">
+      <textarea name="content" rows="4" placeholder="友善发言..." required></textarea>
+      <button class="btn primary" type="submit">发表回复</button>
+    </form>
+  <% } else if (user) { %>
+    <div class="alert warn"><%= canPost.reason %></div>
+  <% } else { %>
+    <div class="alert info"><a href="/login">登录</a> 后可回复</div>
+  <% } %>
+
+  <ul class="reply-list">
+    <% replies.forEach((r, idx) => { %>
+      <li class="reply-item">
+        <div class="reply-head">
+          <a href="/u/<%= r.user_id %>" class="user-chip">
+            <span class="avatar small" style="background:<%= r.avatar_color %>"><%= r.username[0].toUpperCase() %></span>
+            <%= r.username %>
+          </a>
+          <span class="muted">#<%= idx + 1 %></span>
+          <span class="muted"><%= timeAgo(r.created_at) %></span>
+        </div>
+        <div class="reply-content"><%- nl2br(r.content) %></div>
+        <div class="reply-actions">
+          <button class="btn-like small" data-type="reply" data-id="<%= r.id %>">
+            👍 <span class="like-count"><%= likeCount('reply', r.id) %></span>
+            <% if (user && hasLiked(user.id, 'reply', r.id)) { %><span class="liked">已赞</span><% } %>
+          </button>
+          <button class="btn-link report-btn" data-type="reply" data-id="<%= r.id %>">举报</button>
+          <% if ((user && user.id === r.user_id) || canManage) { %>
+            <form action="/r/<%= r.id %>/delete" method="post" class="inline" onsubmit="return confirm('确定删除？')">
+              <button class="btn-link danger">删除</button>
+            </form>
+          <% } %>
+        </div>
+      </li>
+    <% }) %>
+    <% if (replies.length === 0) { %><li class="empty">还没有回复，快来抢沙发</li><% } %>
+  </ul>
+</section>
+
+<!-- 举报模态 -->
+<div id="reportModal" class="modal" style="display:none">
+  <div class="modal-box">
+    <h3>举报</h3>
+    <form id="reportForm" class="form">
+      <input type="hidden" name="target_type" id="reportType">
+      <input type="hidden" name="target_id" id="reportId">
+      <label>原因<textarea name="reason" rows="3" placeholder="请描述举报原因"></textarea></label>
+      <div class="modal-actions">
+        <button type="button" class="btn-mini" onclick="closeReport()">取消</button>
+        <button type="submit" class="btn primary">提交举报</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 版主/管理员操作模态 -->
+<% if (canManage) { %>
+<div id="restrictModal" class="modal" style="display:none">
+  <div class="modal-box">
+    <h3>管理用户</h3>
+    <form action="/restrict" method="post" class="form">
+      <input type="hidden" name="user_id" id="restrictUser">
+      <input type="hidden" name="board_id" id="restrictBoard">
+      <label>操作类型
+        <select name="type">
+          <% if (user.role === 'admin') { %>
+            <option value="site_mute">全站禁言</option>
+            <option value="site_ban">全站封禁</option>
+          <% } %>
+          <option value="board_mute">板块禁言</option>
+          <option value="board_ban">板块封禁</option>
+        </select>
+      </label>
+      <label>持续天数（留空为永久）<input type="number" name="days" min="1" max="3650"></label>
+      <label>原因<input type="text" name="reason" maxlength="200"></label>
+      <div class="modal-actions">
+        <button type="button" class="btn-mini" onclick="closeRestrict()">取消</button>
+        <button type="submit" class="btn primary danger">执行</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function showRestrict(userId, boardId) {
+  document.getElementById('restrictUser').value = userId;
+  document.getElementById('restrictBoard').value = boardId;
+  document.getElementById('restrictModal').style.display = 'flex';
+}
+function closeRestrict() { document.getElementById('restrictModal').style.display = 'none'; }
+</script>
+<% } %>
+
+<%- include('partials/footer') %>

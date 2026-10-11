@@ -1,0 +1,59 @@
+<%- include('partials/header', { title: '匿名留言墙' }) %>
+<div class="card">
+  <h1>🧱 匿名留言墙</h1>
+  <p class="muted">所有留言均匿名展示，经管理员审核后可见。不能回复，但可以点赞。</p>
+  <% if (user && user.status === 'active') { %>
+    <form action="/wall" method="post" class="form">
+      <textarea name="content" rows="3" maxlength="1000" placeholder="写下你想说的话..." required></textarea>
+      <button class="btn primary" type="submit">发布留言（需审核）</button>
+    </form>
+  <% } else { %>
+    <div class="alert info">只有注册并通过审核的用户才能发留言。<a href="/login">登录</a></div>
+  <% } %>
+
+  <% if (myPending.length) { %>
+    <details class="pending-box">
+      <summary>我的待审核留言（<%= myPending.length %>）</summary>
+      <ul>
+        <% myPending.forEach(m => { %>
+          <li><%= m.content %> <span class="muted small">（待审核）</span></li>
+        <% }) %>
+      </ul>
+    </details>
+  <% } %>
+</div>
+
+<div class="wall-grid">
+  <% messages.forEach(m => { %>
+    <div class="wall-note" style="--c:<%= m.avatar_color %>">
+      <p><%- nl2br(m.content) %></p>
+      <div class="wall-foot">
+        <span class="muted small"><%= timeAgo(m.created_at) %></span>
+        <button class="btn-like small" data-type="wall" data-id="<%= m.id %>">
+          👍 <span class="like-count"><%= likeCount('wall', m.id) %></span>
+          <% if (user && hasLiked(user.id, 'wall', m.id)) { %><span class="liked">已赞</span><% } %>
+        </button>
+        <button class="btn-link report-btn" data-type="wall" data-id="<%= m.id %>">举报</button>
+      </div>
+    </div>
+  <% }) %>
+  <% if (messages.length === 0) { %><p class="empty">墙上还空空如也</p><% } %>
+</div>
+
+<!-- 举报模态（同 post 页，可复用） -->
+<div id="reportModal" class="modal" style="display:none">
+  <div class="modal-box">
+    <h3>举报</h3>
+    <form id="reportForm" class="form">
+      <input type="hidden" name="target_type" id="reportType">
+      <input type="hidden" name="target_id" id="reportId">
+      <label>原因<textarea name="reason" rows="3"></textarea></label>
+      <div class="modal-actions">
+        <button type="button" class="btn-mini" onclick="closeReport()">取消</button>
+        <button type="submit" class="btn primary">提交举报</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

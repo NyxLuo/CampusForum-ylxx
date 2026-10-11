@@ -1,0 +1,13 @@
+<%- include('partials/header', { title: '注册' }) %>
+<div class="card narrow">
+  <h2>注册</h2>
+  <p class="hint">注册后需管理员审核，通过后方可发帖、回帖、点赞。</p>
+  <form action="/register" method="post" class="form">
+    <label>用户名<input type="text" name="username" required minlength="2" maxlength="20" autofocus></label>
+    <label>密码<input type="password" name="password" required minlength="6"></label>
+    <label>确认密码<input type="password" name="password2" required minlength="6"></label>
+    <button class="btn primary block" type="submit">提交注册</button>
+  </form>
+  <p class="hint">已有账号？<a href="/login">去登录</a></p>
+</div>
+<%- include('partials/footer') %>

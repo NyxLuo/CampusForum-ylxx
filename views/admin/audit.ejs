@@ -1,0 +1,59 @@
+<%- include('../partials/header', { title: '内容审核' }) %>
+<div class="admin-layout">
+  <aside class="admin-nav">
+    <a href="/admin">📊 概览</a>
+    <a href="/admin/users">👥 用户管理</a>
+    <a class="active" href="/admin/audit">📝 内容审核</a>
+    <a href="/admin/reports">🚨 举报处理</a>
+    <a href="/admin/boards">📋 板块与版主</a>
+  </aside>
+  <div class="admin-main">
+    <h1>内容审核</h1>
+
+    <h2>留言墙（<%= wall.length %>）</h2>
+    <ul class="audit-list">
+      <% wall.forEach(m => { %>
+        <li>
+          <div class="audit-content"><%- nl2br(m.content) %></div>
+          <div class="muted small">来自：<%= m.username %> · <%= formatTime(m.created_at) %></div>
+          <div class="audit-actions">
+            <form action="/admin/audit/wall/<%= m.id %>/approve" method="post" class="inline"><button class="btn-mini primary">通过</button></form>
+            <form action="/admin/audit/wall/<%= m.id %>/reject" method="post" class="inline"><button class="btn-mini danger">拒绝</button></form>
+          </div>
+        </li>
+      <% }) %>
+      <% if (wall.length === 0) { %><li class="empty">暂无待审留言</li><% } %>
+    </ul>
+
+    <h2>漂流瓶（<%= bottles.length %>）</h2>
+    <ul class="audit-list">
+      <% bottles.forEach(b => { %>
+        <li>
+          <div class="audit-content"><%- nl2br(b.content) %></div>
+          <div class="muted small">来自：<%= b.username %> · <%= formatTime(b.created_at) %></div>
+          <div class="audit-actions">
+            <form action="/admin/audit/bottle/<%= b.id %>/approve" method="post" class="inline"><button class="btn-mini primary">通过</button></form>
+            <form action="/admin/audit/bottle/<%= b.id %>/reject" method="post" class="inline"><button class="btn-mini danger">拒绝</button></form>
+          </div>
+        </li>
+      <% }) %>
+      <% if (bottles.length === 0) { %><li class="empty">暂无待审漂流瓶</li><% } %>
+    </ul>
+
+    <h2>漂流瓶回复（<%= bottleReplies.length %>）</h2>
+    <ul class="audit-list">
+      <% bottleReplies.forEach(r => { %>
+        <li>
+          <div class="audit-content"><%- nl2br(r.content) %></div>
+          <div class="muted small">原瓶：<%= r.bottle_content %> · 来自：<%= r.username %></div>
+          <div class="audit-actions">
+            <form action="/admin/audit/bottle-reply/<%= r.id %>/approve" method="post" class="inline"><button class="btn-mini primary">通过</button></form>
+            <form action="/admin/audit/bottle-reply/<%= r.id %>/reject" method="post" class="inline"><button class="btn-mini danger">拒绝</button></form>
+          </div>
+        </li>
+      <% }) %>
+      <% if (bottleReplies.length === 0) { %><li class="empty">暂无待审回复</li><% } %>
+    </ul>
+  </div>
+</div>
+<%- include('../partials/footer') %>

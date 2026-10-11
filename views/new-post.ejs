@@ -1,0 +1,10 @@
+<%- include('partials/header', { title: '发帖' }) %>
+<div class="card">
+  <h2>在「<%= board.name %>」发帖</h2>
+  <form action="/b/<%= board.slug %>/new" method="post" class="form">
+    <label>标题<input type="text" name="title" required minlength="2" maxlength="100" autofocus></label>
+    <label>内容<textarea name="content" rows="10" required></textarea></label>
+    <button class="btn primary" type="submit">发布</button>
+  </form>
+</div>
+<%- include('partials/footer') %>

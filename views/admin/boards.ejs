@@ -1,0 +1,48 @@
+<%- include('../partials/header', { title: '板块与版主' }) %>
+<div class="admin-layout">
+  <aside class="admin-nav">
+    <a href="/admin">📊 概览</a>
+    <a href="/admin/users">👥 用户管理</a>
+    <a href="/admin/audit">📝 内容审核</a>
+    <a href="/admin/reports">🚨 举报处理</a>
+    <a class="active" href="/admin/boards">📋 板块与版主</a>
+  </aside>
+  <div class="admin-main">
+    <h1>板块与版主</h1>
+    <table class="table">
+      <thead><tr><th>板块</th><th>描述</th><th>版主</th><th>任命/撤销</th></tr></thead>
+      <tbody>
+        <% boards.forEach(b => { %>
+          <tr>
+            <td><a href="/b/<%= b.slug %>"><%= b.name %></a></td>
+            <td class="muted"><%= b.description %></td>
+            <td>
+              <% (modMap[b.id] || []).forEach(m => { %>
+                <span class="user-chip">
+                  <span class="avatar small" style="background:<%= m.avatar_color %>"><%= m.username[0].toUpperCase() %></span>
+                  <%= m.username %>
+                </span>
+              <% }) %>
+              <% if (!modMap[b.id] || !modMap[b.id].length) { %><span class="muted">暂无</span><% } %>
+            </td>
+            <td>
+              <form action="/admin/boards/<%= b.id %>/promote" method="post" class="inline">
+                <select name="user_id">
+                  <% activeUsers.forEach(u => { %><option value="<%= u.id %>"><%= u.username %></option><% }) %>
+                </select>
+                <button class="btn-mini primary">任命</button>
+              </form>
+              <form action="/admin/boards/<%= b.id %>/demote" method="post" class="inline">
+                <select name="user_id">
+                  <% (modMap[b.id] || []).forEach(m => { %><option value="<%= m.id %>"><%= m.username %></option><% }) %>
+                </select>
+                <button class="btn-mini danger">撤销</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('../partials/footer') %>
