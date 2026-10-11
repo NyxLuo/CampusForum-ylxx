@@ -6,10 +6,11 @@
     "start": "node server.js"
   },
   "dependencies": {
-      "bcryptjs": "^2.4.3",
-      "ejs": "^3.1.10",
-      "express": "^4.19.2",
-      "express-session": "^1.18.0",
-      "pg": "^8.13.0"
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^18.0.7",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "pg": "^8.23.1"
   }
 }

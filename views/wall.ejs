@@ -30,7 +30,7 @@
       <div class="wall-foot">
         <span class="muted small"><%= timeAgo(m.created_at) %></span>
         <button class="btn-like small" data-type="wall" data-id="<%= m.id %>">
-          👍 <span class="like-count"><%= likeCount('wall', m.id) %></span>
+          👍 <span class="like-count"><%= m.like_count %></span>
           <% if (user && hasLiked(user.id, 'wall', m.id)) { %><span class="liked">已赞</span><% } %>
         </button>
         <button class="btn-link report-btn" data-type="wall" data-id="<%= m.id %>">举报</button>

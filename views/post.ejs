@@ -18,7 +18,7 @@
 
   <div class="post-actions">
     <button class="btn-like" data-type="post" data-id="<%= post.id %>">
-      👍 <span class="like-count"><%= likeCount('post', post.id) %></span>
+      👍 <span class="like-count"><%= post.like_count %></span>
       <% if (user && hasLiked(user.id, 'post', post.id)) { %><span class="liked">已赞</span><% } %>
     </button>
     <button class="btn-link report-btn" data-type="post" data-id="<%= post.id %>">举报</button>
@@ -66,7 +66,7 @@
         <div class="reply-content"><%- nl2br(r.content) %></div>
         <div class="reply-actions">
           <button class="btn-like small" data-type="reply" data-id="<%= r.id %>">
-            👍 <span class="like-count"><%= likeCount('reply', r.id) %></span>
+            👍 <span class="like-count"><%= r.like_count %></span>
             <% if (user && hasLiked(user.id, 'reply', r.id)) { %><span class="liked">已赞</span><% } %>
           </button>
           <button class="btn-link report-btn" data-type="reply" data-id="<%= r.id %>">举报</button>
